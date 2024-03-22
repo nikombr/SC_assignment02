@@ -1,0 +1,25 @@
+
+set(groot,'defaultAxesTickLabelInterpreter','latex'); 
+set(groot,'defaulttextinterpreter','latex');
+set(groot,'defaultLegendInterpreter','latex');
+
+%% Test of method
+
+clear; close all; clc;
+
+% Parameters
+N = 100;
+M = 200;
+epsilon = 0.1;
+k = ((2/N)^2/(2*epsilon));
+M = 
+
+% Call function
+U = ForwardTimeCentralSpace(N,M,k,epsilon);
+
+% Plot solution
+plotSolution(U,M,N,k);
+
+
+
+
