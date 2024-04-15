@@ -28,8 +28,8 @@ plot(T(2:end),E)
 %% Compute solution for varying deltas
 
 clear; close all; clc;
-reps = 10^(-4);
-aeps = 10^(-6);
+reps = 10^(-6);
+aeps = 10^(-8);
 opts = odeset('RelTol',reps,'AbsTol',aeps);
 b = 10;
 a = -log(200)/10;
@@ -71,8 +71,10 @@ lis = linspace(0,b,100);
 deltas = 1/50*exp(a*lis);
 
 
-reps = [10^(-2) 10^(-3) 10^(-4) 10^(-5) 10^(-6)];
-aeps = [10^(-4) 10^(-5) 10^(-6) 10^(-7) 10^(-8)];
+%reps = [10^(-2) 10^(-3) 10^(-4) 10^(-5) 10^(-6)];
+%aeps = [10^(-4) 10^(-5) 10^(-6) 10^(-7) 10^(-8)];
+reps = [10^(-3) 10^(-4) 10^(-5) 10^(-6)];
+aeps = [10^(-5) 10^(-6) 10^(-7) 10^(-8)];
 
 numSteps = cell(length(reps),length(aeps));
 

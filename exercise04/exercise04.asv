@@ -22,7 +22,7 @@ plotSolution(@fun,U,M,N,k,epsilon);
 
 clear; close all; clc;
 
-N = 11000;
+N = 5000;
 h = 1/(N+1);
 tstar = 1.6037/pi;
 tmax = tstar;
@@ -37,7 +37,7 @@ epsilon = 0.01/pi;
 %M = ceil(tmax/k);
 %M = 20;
 
-M = 110000;
+M = 30000;
 k = tmax/M;
 hm = min(h^2/(2*epsilon),2*h)
 
@@ -64,9 +64,9 @@ grid on
 xbar = 0
 
 nabo = 40
-y = computeDerivative(u,x,5,5,N,xbar)
+y = computeDerivative(u,x,3,3,N,xbar)
 
-%%
+
 N = 2000;
 epsilon = 0.01/pi;
 x = linspace(-1,1,N+1);

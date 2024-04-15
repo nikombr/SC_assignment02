@@ -15,8 +15,8 @@ Y = [y];
 H = [h];
 E = [];
 numStep = 0;
-facmin = 0.1; % Maximum decrease factor
-facmax = 2.0;%5.0; % Maximum increase factor
+%facmin = 0.1; % Maximum decrease factor
+%facmax = 2.0;%5.0; % Maximum increase factor
 % Iterate through time
 while t < tend
     % If less than h away from end time - set h to be the time difference
@@ -29,8 +29,8 @@ while t < tend
     tol = reps * norm(y) + aeps;
     % Asymptotic step size controller
     change = (tol/error)^(1/3); 
-    %h = change*h;
-    h = max(facmin, min(change,facmax))*h;
+    h = change*h;
+    %h = max(facmin, min(change,facmax))*h;
     % Save data
     T = [T t];
     Y = [Y y];
