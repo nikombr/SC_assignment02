@@ -1,4 +1,4 @@
-function [T, Y, H, E, numStep] = RungeKutta(fun,y0,t0,tend,h0,reps,aeps,varargin)
+function [time, funEval, stepSize, error, numStep] = RungeKutta(fun,y0,t0,tend,h0,reps,aeps,varargin)
 % reps: relative error tolerance
 % aeps: absolute error tolerance
 % t0:   start time
@@ -10,10 +10,7 @@ t = t0;
 y = y0;
 h = h0;
 % Save data
-T = [t];
-Y = [y];
-H = [h];
-E = [];
+time = [t]; funEval = [y]; stepSize = [h]; error = [];
 numStep = 0;
 %facmin = 0.1; % Maximum decrease factor
 %facmax = 2.0;%5.0; % Maximum increase factor
@@ -24,18 +21,13 @@ while t < tend
         h = tend - t;
     end
     % Do step
-    [t, y, error] = RungeKuttaStep(fun,t,y,h,varargin{:});
+    [t, y, e] = RungeKuttaStep(fun,t,y,h,varargin{:});
     % Compute tol for step update
     tol = reps * norm(y) + aeps;
     % Asymptotic step size controller
-    change = (tol/error)^(1/3); 
-    h = change*h;
-    %h = max(facmin, min(change,facmax))*h;
+    h = (tol/e)^(1/3)*h;
     % Save data
-    T = [T t];
-    Y = [Y y];
-    H = [H h];
-    E = [E error];
+    time = [time t]; funEval = [funEval y]; stepSize = [stepSize h]; error = [error e];
     % Count number of steps
     numStep = numStep + 1;
 end
