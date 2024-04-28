@@ -72,5 +72,7 @@ elif runtype == 3: # Advection
 U = model.predict().cpu().detach().numpy().reshape([N,M]).T
 X = model.X.detach().cpu().numpy().reshape([N,M]).T
 T = model.T.detach().cpu().numpy().reshape([N,M]).T
-mdic = {"U": U, "T": T, "X": X, "loss": "loss"}
+x = model.x.detach().cpu().numpy()
+t = model.t.detach().cpu().numpy()
+mdic = {"U": U, "T": T, "X": X, "loss": loss, "x": x, "t": t}
 savemat(f"results/{name}.mat", mdic)
