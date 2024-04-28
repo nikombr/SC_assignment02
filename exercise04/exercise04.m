@@ -5,19 +5,19 @@ set(groot,'defaultLegendInterpreter','latex');
 %% Testing
 clear; close all; clc;
 
-N = 400;
+N = 5;
 tmax = 0.1;   
 epsilon = 0.1;
 k = ((2/N)/(epsilon)); % Largest value while preserving stability
 k = 0.001;
 k = 0.00001;
 %M = ceil(tmax/k);
-M = 9000;
+M = 10;
 kmax = ((2/N)/(epsilon))
 k = tmax/M
 U = AdvectionDiffusion(@boundaryFun,N,M,tmax,epsilon);
 
-plotSolution(@fun,U,M,N,tmax,true,epsilon);
+plotSolution(@tanhFun,U,M,N,tmax,true,epsilon);
 
 %% Illustration
 
@@ -35,7 +35,7 @@ for i = 1:3
     N = Ns(i);
     M = Ms(i);
     U = AdvectionDiffusion(@boundaryFun,N,M,tmax,epsilon);
-    plotSolution(@fun,U,M,N,tmax,false,epsilon);
+    plotSolution(@tanhFun,U,M,N,tmax,false,epsilon);
 end
 
 exportgraphics(gcf,'../plots/exercise04/illustration.png','Resolution',300);
@@ -61,7 +61,7 @@ for i = 1:length(Ns)
     U = AdvectionDiffusion(@boundaryFun,N,M,tmax,epsilon);
     x = linspace(-1,1,N+1);
     [X, T] = meshgrid(x,t);
-    utrue = fun(X,T,epsilon);
+    utrue = tanhFun(X,T,epsilon);
     error_spatial(i) = max(max(abs(U - utrue)));
     clear U
 end
@@ -217,12 +217,18 @@ clear; close all; clc;
 epsilon = 0.01/pi;
 tstar = 1.6037/pi; % Time of evaluation of derivative
 tmax = tstar;
-N = 500;
-Nfine = 500;
-M = 10000;
+N = 100;
+Nfine = 1000;
+M = 4000;
 
-[U,x,t] = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon,Nfine);
-nexttile;
+N = 600;
+Nfine = 600;
+M = 90000;
+
+[U,x,t] = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon,'nonuniform',Nfine);
+figure
+plot(x,x,'o-')
+figure;
 imagesc(x,t,U)
 axis square
 title(sprintf("$N = %d$, $M=%d$",N,M),'fontsize',13)
@@ -231,7 +237,7 @@ clim([-1,1])
 fontsize=13;
 xlabel('$x$','FontSize',fontsize)
 ylabel('$t$','FontSize',fontsize)
-%% tester lgie
+%% tester lige
 clear; clc; close all;
 
 m = 10
@@ -244,19 +250,19 @@ for i=2:m+1
     A(i,i-1:i+1) = fdcoeffV(2, x(i), x((i-1):(i+1)));
 end
 
-D2 = A(2:end-1,2:end-1); % Exercise 2
+FTCS2 = A(2:end-1,2:end-1); % Exercise 2
 
 for i=2:m+1
     A(i,i-1:i+1) = 2*fdcoeffV(1, x(i), x((i-1):(i+1)));
 end
 
-A % FTCS (exercise 3) uden grænserne :=)
+FTCS = A(2:end-1,2:end-1) % FTCS
 
 for i=2:m+1
     A(i,i-1:i) = 2*fdcoeffV(1, x(i), x((i-1):(i)));
 end
 
-A
+FTBS = A(2:end-1,2:end-1) % FTBS
 
 
 %% Matlab solution

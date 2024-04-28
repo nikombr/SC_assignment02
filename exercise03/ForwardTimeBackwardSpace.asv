@@ -7,15 +7,14 @@ k = tmax/M;
 frac = a*k/h;
 
 A = diag(ones(N-1,1),-1)-diag(ones(N,1));
-%A = diag(ones(N,1),-1)-diag(ones(N+1,1));
-A(1,end) = 1;
+A(1,end) = 1
 A = frac*A;
 
 % Compute conditions
 U(1,:) = fun(x,0);     % eta - initial condition
 
 % Iterate through time 
+size(U(1,:)')
 for j = 1:M
-    U(j+1,2:end) = U(j,2:end)' + A*U(j,2:end)';
-    U(j+1,1) = U(j+1,end);
+    U(j+1,2:en) = U(j,:)' + A*U(j,:)';
 end

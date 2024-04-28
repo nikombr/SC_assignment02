@@ -1,8 +1,9 @@
-function U = ForwardTimeCentralSpace(N,M,k,epsilon)
+function U = ForwardTimeCentralSpace(N,M,tmax,epsilon)
 % Initialize
 U = zeros(M+1,N+1); 
 x = linspace(-1,1,N+1);
-t = linspace(0,k*M,M+1);
+k = tmax/M;
+t = linspace(0,tmax,M+1);
 h = 2/N;
 frac = epsilon * k/h^2;
 calc = 1-2*frac;

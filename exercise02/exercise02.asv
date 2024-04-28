@@ -113,10 +113,10 @@ exportgraphics(gcf,save_name,'Resolution',300);
 clear; close all; clc;
 
 % Parameters
-M = 900;
+M = 10000;
 tmax = 0.5;
 epsilon = 0.1;
-N = round(linspace(10,200,100));
+N = round(linspace(10,200,10));
 
 t = linspace(0,tmax,M+1);
 h = 2./N;
@@ -143,20 +143,14 @@ for i = 1:length(N)
 
 end
 
-figure('Renderer', 'painters', 'Position', [400 400 600 300]);
+figure('Renderer', 'painters', 'Position', [400 400 6000 300]);
 
-loglog(h,error,'LineWidth',1.5,'DisplayName','$||U-u(x,t)||_{\infty}$')
+loglog(h,error,'LineWidth',1.5)
 hold on
-loglog(h,h.^2,'--','LineWidth',1.5,'DisplayName','$\mathcal{O}(h^2)$')
+loglog(h,h.^2,'LineWidth',1.5,'DisplayName','$h^2$')
 grid on
 
 legend('fontsize',15,'location','northwest')
-xlabel('$h$','fontsize',15)
-ylabel('Error','fontsize',15)
-
-% Save plot
-save_name = sprintf('../plots/exercise02/convergence_spatial_M_%d.png',M);
-exportgraphics(gcf,save_name,'Resolution',300);
 
 %% hmm spørg Allan
 
@@ -164,7 +158,6 @@ clear; close all; clc;
 
 % Parameters
 N = 200;
-h = 2/N;
 tmax = 0.5;
 epsilon = 0.1;
 k = linspace(10^(-4),((2/N)^2/(2*epsilon)),100);
@@ -173,13 +166,15 @@ M = ceil(tmax/k(1));
 
 % True solution
 x = linspace(-1,1,N+1);
+t = linspace(0,k(1)*M,M+1);
+[X, T] = meshgrid(x,t);
+utrue = fun(X,T);
 
 error = zeros(length(k),1);
 
 for i = 1:length(k)
-    i
     M = ceil(tmax/k(i));
-    t = linspace(0,tmax,M+1);
+    t = linspace(0,k(i)*M,M+1);
     [X, T] = meshgrid(x,t);
     utrue = fun(X,T);
 
@@ -190,14 +185,10 @@ for i = 1:length(k)
 
     error(i) = max(max(U-utrue));
 
-    if k(i) > h^2/(2*epsilon)
-        disp("Stability not satisfied!")
-    end
-
 end
 
 
 
 loglog(k,error)
 hold on
-loglog(k,k)
+loglog(k,k.^2)

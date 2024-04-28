@@ -1,10 +1,12 @@
-function plotSolution(U,M,N,k)
+function plotSolution(U,M,N,tmax,epsilon)
 
 fontsize = 13;
 x = linspace(-1,1,N+1);
-t = linspace(0,k*M,M+1);
+k = tmax/M;
+t = linspace(0,tmax,M+1);
 [X, T] = meshgrid(x,t);
 utrue = fun(X,T);
+h = 2/N;
 
 
 figure('Renderer', 'painters', 'Position', [400 400 1000 300]);
@@ -36,4 +38,10 @@ title('\textbf{Absolute Error}','FontSize',fontsize+2)
 xlabel('$x$','FontSize',fontsize)
 ylabel('$t$','FontSize',fontsize)
 
-sgtitle(sprintf('$N=%d$, $M=%d$, $k=%.4f$',N,M,k),'FontSize',fontsize+3,'interpreter','latex')
+
+
+if k <= h^2/(2*epsilon)
+    sgtitle(sprintf('$N=%d$, $M=%d$, $k=%.5f\\leq %.5f=h^2/(2\\varepsilon)$',N,M,k,h^2/(2*epsilon)),'FontSize',fontsize+4,'interpreter','latex')
+else
+    sgtitle(sprintf('$N=%d$, $M=%d$, $k=%.5f\\not\\leq %.5f=h^2/(2\\varepsilon)$',N,M,k,h^2/(2*epsilon)),'FontSize',fontsize+4,'interpreter','latex')
+end

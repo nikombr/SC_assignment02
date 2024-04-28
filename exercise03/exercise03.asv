@@ -165,53 +165,7 @@ grid on
 legend('fontsize',15,'location','northwest')
 xlabel('$h$','fontsize',15)
 ylabel('Error','fontsize',15)
-xlim([min(h),max(h)])
 
 % Save plot
 save_name = sprintf('../plots/exercise03/convergence_spatial_M_%d.png',M);
 exportgraphics(gcf,save_name,'Resolution',300);
-
-
-%% hmm spørg Allan
-
-clear; close all; clc;
-
-% Parameters
-N = 200;
-h = 2/N;
-tmax = 2;
-a = 0.5;
-k = linspace(10^(-4),h/a,100);
-k = k(2:end); 
-M = ceil(tmax/k(1));
-
-% True solution
-x = linspace(-1,1,N+1);
-
-error = zeros(length(k),1);
-
-for i = 1:length(k)
-    i
-    M = ceil(tmax/k(i));
-    t = linspace(0,tmax,M+1);
-    [X, T] = meshgrid(x,t);
-    utrue = fun(X,T);
-
-    k(i) = tmax/M;
-    
-    % Call function
-    U = ForwardTimeBackwardSpace(N,M,tmax,a);
-
-    error(i) = max(max(U-utrue));
-
-    if k(i) > h/a
-        disp("Stability not satisfied!")
-    end
-
-end
-
-
-
-loglog(k,error)
-hold on
-loglog(k,k)
