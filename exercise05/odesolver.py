@@ -16,6 +16,11 @@ class ODESolver:
                  verbose = False,
                  pde = False
                 ):
+
+        # Check for cuda
+
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
         """
         arguments: self explanatory
             differentials: list of booleans encoding truth value for needed dx, dt, dxx, dtt.
@@ -26,13 +31,13 @@ class ODESolver:
         self.model = PINN(hidden_dimensions = hidden_dimensions,activation_fn = activation_fn)#PINN(hidden_dimensions=hidden_dimensions,activation_fn=activation_fn)
         
         # Create grid over the whole domain
-        x   = torch.linspace(xmin, xmax, steps = N, requires_grad=True)
-        t   = torch.linspace(0   , tmax, steps = M, requires_grad=True)
+        x   = torch.linspace(xmin, xmax, steps = N, requires_grad=True).to(device)
+        t   = torch.linspace(0   , tmax, steps = M, requires_grad=True).to(device)
         grid   = torch.meshgrid(x, t, indexing="ij")
 
         # Save grid to class
-        self.x, self.t = x.reshape(-1,1), t.reshape(-1,1)
-        self.X, self.T = grid[0].flatten().reshape(-1,1), grid[1].flatten().reshape(-1,1)
+        self.x, self.t = x.reshape(-1,1).to(device), t.reshape(-1,1).to(device)
+        self.X, self.T = grid[0].flatten().reshape(-1,1).to(device), grid[1].flatten().reshape(-1,1).to(device)
 
         #self.X = torch.stack(torch.meshgrid(x, t)).reshape(2, -1).T
 
@@ -52,15 +57,15 @@ class ODESolver:
         #self.y_train = torch.cat([gL, gR, eta]).unsqueeze(1)
 
         # Set place of initial and boundary conditions
-        self.t_initial = (torch.ones_like(x, requires_grad = True)*t[0]).reshape(-1,1)
-        self.x_boundary_gL = (torch.ones_like(t, requires_grad = True)*x[0]).reshape(-1,1)
-        self.x_boundary_gR = (torch.ones_like(t, requires_grad = True)*x[-1]).reshape(-1,1)
+        self.t_initial = (torch.ones_like(x, requires_grad = True)*t[0]).reshape(-1,1).to(device)
+        self.x_boundary_gL = (torch.ones_like(t, requires_grad = True)*x[0]).reshape(-1,1).to(device)
+        self.x_boundary_gR = (torch.ones_like(t, requires_grad = True)*x[-1]).reshape(-1,1).to(device)
 
         # Get the value in initial and boundary conditions
-        self.u_initial     = self.initial_condition(x = self.x, t = self.t_initial)
+        self.u_initial     = self.initial_condition(x = self.x, t = self.t_initial).to(device)
         if self.boundary_condition is not False:
-            self.u_boundary_gL = self.boundary_condition(x = self.x_boundary_gL, t = self.t)
-            self.u_boundary_gR = self.boundary_condition(x = self.x_boundary_gR, t = self.t)
+            self.u_boundary_gL = self.boundary_condition(x = self.x_boundary_gL, t = self.t).to(device)
+            self.u_boundary_gR = self.boundary_condition(x = self.x_boundary_gR, t = self.t).to(device)
 
         #save everything we need to class
         #self.x, self.t = grids[0].flatten().reshape(-1,1), grids[1].flatten().reshape(-1,1)

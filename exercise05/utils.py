@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 class PINN(nn.Module):
     def __init__(self,hidden_dimensions: list = [2,128,1],activation_fn = nn.Tanh()):
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         super(PINN,self).__init__()
         self.layers = nn.ModuleList([])
         self.activation_fn = activation_fn
@@ -13,7 +14,7 @@ class PINN(nn.Module):
             if(i < len(hidden_dimensions)-2): #no activation for final layer 
                 self.layers.append(self.activation_fn)
         
-        self.layers = nn.Sequential(*self.layers)
+        self.layers = nn.Sequential(*self.layers).to(self.device)
 
     def forward(self,x,t):
         #print_shape(x)
@@ -23,6 +24,7 @@ class PINN(nn.Module):
     
 #order is order of differentiation
 def df(output: torch.Tensor, input_var: torch.Tensor, order: int = 1) -> torch.Tensor:
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     """Compute neural network derivative with respect to input features using PyTorch autograd engine"""
     df_value = output      # <-- we directly take the output of the NN
     for _ in range(order):
@@ -33,7 +35,7 @@ def df(output: torch.Tensor, input_var: torch.Tensor, order: int = 1) -> torch.T
             create_graph=True,
             retain_graph=True,
         )[0]
-    return df_value
+    return df_value.to(device)
 
 def dfdt(model: PINN, x: torch.Tensor, t: torch.Tensor, order: int = 1):
     """Derivative with respect to the time variable of arbitrary order"""
