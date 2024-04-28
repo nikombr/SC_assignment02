@@ -14,7 +14,8 @@ class ODESolver:
                  xmin: float = -1, 
                  xmax: float  = 1, 
                  verbose = False,
-                 pde = False
+                 pde = False,
+                 learning_rate: float = 1e-2
                 ):
 
         # Check for cuda
@@ -83,7 +84,7 @@ class ODESolver:
         self.criterion = torch.nn.MSELoss()
         
         #setup optimization
-        self.optimizer = Adam(self.model.parameters(), lr=1e-2, betas=(0.9,0.999), weight_decay=0.0, amsgrad=False)
+        self.optimizer = Adam(self.model.parameters(), lr=learning_rate, betas=(0.9,0.999), weight_decay=0, amsgrad=False)
         
 
     def predict_compute_losses(self):
