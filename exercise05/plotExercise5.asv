@@ -1,0 +1,20 @@
+
+%% Parabolic
+
+clear; close all; clc;
+
+load 'results/parabolic.mat'
+
+
+figure('Renderer', 'painters', 'Position', [400 400 1000 300]);
+tiledlayout(1,2,'TileSpacing','compact');
+
+nexttile
+plot(loss)
+
+nexttile
+imagesc(t,x,U)
+
+
+
+
