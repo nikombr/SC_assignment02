@@ -25,7 +25,7 @@ if runtype == 1: # Parabolic
                     activation_fn = nn.Tanh(),
                     N = N,
                     M = M,
-                    tmax = 1.0,
+                    tmax = 0.5,
                     verbose = False,
                     pde = parabolic)
 
