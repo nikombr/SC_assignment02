@@ -119,11 +119,13 @@ elif runtype == 2: # Hyperbolic
 
     hyperbolic = Hyperbolic()
 
+    H = [2,40,40,40,40,40,1];
+
     tmax = 2.0
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-    model = ODESolver(hidden_dimensions = [2,20,20,20,20,20,1],
+    model = ODESolver(hidden_dimensions = H,
                     activation_fn = nn.Tanh(),
                     N = N,
                     M = M,
@@ -159,7 +161,10 @@ elif runtype == 3: # Advection
 
     tmax = 1.6037/torch.pi # Time where we want to estiamte the derivative
 
-    model = ODESolver(hidden_dimensions = [2,20,20,20,20,20,1],
+    H = [2,20,20,20,20,20,1];
+    H = [2,40,40,40,40,40,1];
+
+    model = ODESolver(hidden_dimensions = H,
                     activation_fn = nn.Tanh(),
                     N = N,
                     M = M,
