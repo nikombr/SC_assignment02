@@ -18,28 +18,36 @@ M = 1000
 if runtype == 1: # Parabolic
 
     name = "parabolic"
-
     parabolic = Parabolic()
 
-    model = ODESolver(hidden_dimensions = [2,20,20,20,20,20,1],
-                    activation_fn = nn.Tanh(),
-                    N = N,
-                    M = M,
-                    tmax = 0.5,
-                    verbose = False,
-                    pde = parabolic)
+    hn = [20, 40, 80]
 
-    N_EPOCHS = 3000
-    loss = model.train(N_EPOCHS)
+    for i, h in enumerate(hn):
+        H = [[2,h,1], [2,h,h,h,1], [2,h,h,h,h,h,1]]
 
-    U = model.predict().cpu().detach().numpy().reshape([N,M]).T
-    X = model.X.detach().cpu().numpy().reshape([N,M]).T
-    T = model.T.detach().cpu().numpy().reshape([N,M]).T
-    x = model.x.detach().cpu().numpy()
-    t = model.t.detach().cpu().numpy()
-    mdic = {"U": U, "T": T, "X": X, "loss": loss, "x": x, "t": t}
+        for j in range(3):
 
-    # Experiments
+            torch.manual_seed(1)
+
+            model = ODESolver(hidden_dimensions = H[j],
+                            activation_fn = nn.Tanh(),
+                            N = N,
+                            M = M,
+                            tmax = 0.5,
+                            verbose = False,
+                            pde = parabolic)
+
+            N_EPOCHS = 3000
+            loss = model.train(N_EPOCHS)
+
+            U = model.predict().cpu().detach().numpy().reshape([N,M]).T
+            X = model.X.detach().cpu().numpy().reshape([N,M]).T
+            T = model.T.detach().cpu().numpy().reshape([N,M]).T
+            x = model.x.detach().cpu().numpy()
+            t = model.t.detach().cpu().numpy()
+            mdic = {"U": U, "T": T, "X": X, "loss": loss, "x": x, "t": t}
+
+            savemat(f"results/{name}_{i}_{j}.mat", mdic)
 
 elif runtype == 2: # Hyperbolic
 
@@ -106,4 +114,4 @@ elif runtype == 3: # Advection
     mdic = {"U": U, "T": T, "X": X, "loss": loss, "x": x, "t": t}
 
 
-savemat(f"results/{name}.mat", mdic)
+    savemat(f"results/{name}.mat", mdic)
