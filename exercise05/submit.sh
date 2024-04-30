@@ -6,6 +6,7 @@
 #BSUB -W 500 # useable time in minutes
 ##BSUB -N # send mail when done
 #BSUB -R "span[hosts=1]"
+#BSUB -gpu "num=2:mode=exclusive_process"
 
 
 module load python3/3.10.13
