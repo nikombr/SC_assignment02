@@ -14,6 +14,6 @@ pip3 install torch
 pip3 install tqdm
 pip3 install scipy
 
-python3 main.py 1
+## python3 main.py 1
 python3 main.py 2
-python3 main.py 3
+## python3 main.py 3

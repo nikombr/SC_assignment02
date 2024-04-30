@@ -153,6 +153,8 @@ elif runtype == 2: # Hyperbolic
 
     mdic = {"U": U, "T": T, "X": X, "loss": loss, "x": x, "t": t, "U_pred": U_pred, "t_pred": t_pred.detach().cpu().numpy()}
 
+    savemat(f"results/{name}.mat", mdic)
+
 elif runtype == 3: # Advection
 
     name = "advection"
