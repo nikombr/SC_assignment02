@@ -113,10 +113,11 @@ exportgraphics(gcf,save_name,'Resolution',300);
 clear; close all; clc;
 
 % Parameters
-M = 900;
+M = 10000;
 tmax = 0.5;
 epsilon = 0.1;
 N = round(linspace(10,200,100));
+k  = tmax/M;
 
 t = linspace(0,tmax,M+1);
 h = 2./N;
@@ -125,7 +126,7 @@ h = 2./N;
 error = zeros(length(N),1);
 
 for i = 1:length(N)
-    
+    i
     x = linspace(-1,1,N(i)+1);
     [X, T] = meshgrid(x,t);
     utrue = fun(X,T);
@@ -134,8 +135,6 @@ for i = 1:length(N)
     U = ForwardTimeCentralSpace(N(i),M,tmax,epsilon);
 
     error(i) = max(max(U-utrue));
-
-    k  = tmax/M;
     
     if k > h(i)^2/(2*epsilon)
         disp("Stability not satisfied!")
@@ -143,8 +142,9 @@ for i = 1:length(N)
 
 end
 
-figure('Renderer', 'painters', 'Position', [400 400 600 300]);
-
+figure('Renderer', 'painters', 'Position', [400 400 1000 300]);
+tiledlayout(1,2,'TileSpacing','compact');
+nexttile;
 loglog(h,error,'LineWidth',1.5,'DisplayName','$||U-u(x,t)||_{\infty}$')
 hold on
 loglog(h,h.^2,'--','LineWidth',1.5,'DisplayName','$\mathcal{O}(h^2)$')
@@ -153,14 +153,61 @@ grid on
 legend('fontsize',15,'location','northwest')
 xlabel('$h$','fontsize',15)
 ylabel('Error','fontsize',15)
+title(sprintf('$k=%.2f\\cdot 10^{-5}$',k*10^(5)),'FontSize',15)
 
 % Save plot
-save_name = sprintf('../plots/exercise02/convergence_spatial_M_%d.png',M);
+%save_name = sprintf('../plots/exercise02/convergence_spatial_M_%d.png',M);
+%exportgraphics(gcf,save_name,'Resolution',300);
+
+
+% Parameters
+tmax = 0.5;
+epsilon = 0.1;
+N = round(linspace(10,200,100));
+
+h = 2./N;
+k = h.^2;
+M = ceil(tmax./k);
+
+% Allocate space
+error = zeros(length(N),1);
+
+for i = 1:length(N)
+
+    t = linspace(0,tmax,M(i)+1);
+    
+    x = linspace(-1,1,N(i)+1);
+    [X, T] = meshgrid(x,t);
+    utrue = fun(X,T);
+    
+    % Call function
+    U = ForwardTimeCentralSpace(N(i),M(i),tmax,epsilon);
+
+    error(i) = max(max(U-utrue));
+    
+    if k(i) > h(i)^2/(2*epsilon)
+        disp("Stability not satisfied!")
+    end
+
+end
+
+%figure('Renderer', 'painters', 'Position', [400 400 600 300]);
+nexttile;
+loglog(h,error,'LineWidth',1.5,'DisplayName','$||U-u(x,t)||_{\infty}$')
+hold on
+loglog(h,h.^2,'--','LineWidth',1.5,'DisplayName','$\mathcal{O}(h^2)=\mathcal{O}(k)$')
+grid on
+
+legend('fontsize',15,'location','northwest')
+xlabel('$h$','fontsize',15)
+ylabel('Error','fontsize',15)
+title('$k=h^2$','FontSize',15)
+
+% Save plot
+save_name = '../plots/exercise02/convergence_combined.png';
 exportgraphics(gcf,save_name,'Resolution',300);
 
-%% hmm spørg Allan
-
-clear; close all; clc;
+%%
 
 % Parameters
 N = 200;

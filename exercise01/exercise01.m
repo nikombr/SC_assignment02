@@ -119,3 +119,44 @@ for i = 1:length(reps)
 end
 
 exportgraphics(gcf,'../plots/exercise01/tolerance_test.png','Resolution',300);
+
+%% Convergence plot
+
+
+clear; close all; clc;
+
+b = 10;
+a = -log(200)/10;
+lis = linspace(0,b,100);
+deltas = 1/50*exp(a*lis);
+
+
+%reps = [10^(-2) 10^(-3) 10^(-4) 10^(-5) 10^(-6)];
+%aeps = [10^(-4) 10^(-5) 10^(-6) 10^(-7) 10^(-8)];
+reps = [10^(-3) 10^(-4) 10^(-5) 10^(-6)];
+aeps = [10^(-5) 10^(-6) 10^(-7) 10^(-8)];
+expo = linspace(-10,-3,10);
+reps = 10.^expo;
+aeps = 10.^expo;
+
+error = cell(length(reps),length(aeps));
+error_estimation = cell(length(reps),length(aeps));
+
+
+%deltas = linspace(0.02, 0.0001,9);
+for k = 1:length(deltas)
+    delta = deltas(k);
+    y0 = delta;
+    t0 = 0;
+    tend = 2/delta;
+    h0 = 1/tend;
+    for i = 1:length(reps)
+        for j = 1:length(aeps)
+            
+            [T, Y, H, E, numStep] = RungeKutta(@fun,y0,t0,tend,h0,reps(i),aeps(j));
+            error_estimation(i,j) = norm(E,'inf');
+            error = 
+        end
+    
+    end
+end

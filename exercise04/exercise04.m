@@ -15,7 +15,7 @@ k = 0.00001;
 M = 10;
 kmax = ((2/N)/(epsilon))
 k = tmax/M
-U = AdvectionDiffusion(@boundaryFun,N,M,tmax,epsilon);
+U = AdvectionDiffusion(@boundaryFun,N,M,tmax,epsilon,"uniform");
 
 plotSolution(@tanhFun,U,M,N,tmax,true,epsilon);
 
@@ -34,7 +34,7 @@ tiledlayout(3,3,'TileSpacing','compact');
 for i = 1:3
     N = Ns(i);
     M = Ms(i);
-    U = AdvectionDiffusion(@boundaryFun,N,M,tmax,epsilon);
+    U = AdvectionDiffusion(@boundaryFun,N,M,tmax,epsilon,"uniform");
     plotSolution(@tanhFun,U,M,N,tmax,false,epsilon);
 end
 
@@ -48,72 +48,76 @@ numEval = 60;
 epsilon = 0.1;
 
 Nmin = 50;
-Nmax = 1500;
-M = 15000;
+Nmax = 1000;
+M = 10000;
 tmax = 0.1;
-Ns = round(linspace(Nmin,Nmax,numEval));
-hs = 2./Ns;
+N = round(linspace(Nmin,Nmax,numEval));
+h = 2./N;
 t = linspace(0,tmax,M+1);
-error_spatial = zeros(length(Ns),1);
+error_spatial = zeros(length(N),1);
 
-for i = 1:length(Ns)
-    N = Ns(i)
-    U = AdvectionDiffusion(@boundaryFun,N,M,tmax,epsilon);
-    x = linspace(-1,1,N+1);
+for i = 1:length(N)
+    i
+    U = AdvectionDiffusion(@boundaryFun,N(i),M,tmax,epsilon,'uniform');
+    x = linspace(-1,1,N(i)+1);
     [X, T] = meshgrid(x,t);
     utrue = tanhFun(X,T,epsilon);
     error_spatial(i) = max(max(abs(U - utrue)));
     clear U
 end
+%%
+Nmin = 50;
+Nmax = 500;
+tmax = 0.1;
+N = round(linspace(Nmin,Nmax,numEval));
+h = 2./N;
+k = h.^2;
+M = ceil(tmax./k);
 
+error = zeros(length(N),1);
 
-N = 300;
-Mmax = 10000;
-Mmin = 300;
-Ms = round(linspace(Mmin,Mmax,numEval));
-ks = tmax./Ms;
-x = linspace(-1,1,N+1);
-error_time = zeros(length(Ns),1);
-
-for i = 1:length(Ms)
-    M = Ms(i)
-    U = AdvectionDiffusion(@boundaryFun,N,M,tmax,epsilon);
-    t = linspace(0,tmax,M+1);
+for i = 1:length(N)
+    i
+    U = AdvectionDiffusion(@boundaryFun,N(i),M(i),tmax,epsilon,"uniform");
+    t = linspace(0,tmax,M(i)+1);
+    x = linspace(-1,1,N(i)+1);
     [X, T] = meshgrid(x,t);
-    utrue = fun(X,T,epsilon);
-    error_time(i) = max(max(abs(U - utrue)));
+    utrue = tanhFun(X,T,epsilon);
+    error(i) = max(max(abs(U - utrue)));
     clear U
 end
-
-
+%%
 figure('Renderer', 'painters', 'Position', [400 400 1000 300]);
 tiledlayout(1,2,'TileSpacing','compact');
 nexttile;
-loglog(hs,error_spatial,'DisplayName',"$||U-u(x,t)||_\infty$")
+loglog(h,error_spatial,'LineWidth',1.5,'DisplayName',"$||U-u(x,t)||_\infty$")
 hold on
-loglog(hs,hs,'DisplayName','$h$')
+loglog(h,h,'--','LineWidth',1.5,'DisplayName','$\mathcal{O}(h)$')
 grid on
 legend('FontSize',15,'Location','northwest')
 xlabel('$h$','FontSize',15)
 ylabel('Error','FontSize',15)
+title(sprintf('$k=%.2f\\cdot 10^{-5}$',tmax/10000*10^(5)),'FontSize',15)
 nexttile;
-loglog(ks,error_time,'DisplayName',"$||U-u(x,t)||_\infty$")
+loglog(h,error,'LineWidth',1.5,'DisplayName',"$||U-u(x,t)||_\infty$")
 hold on
-%loglog(ks,ks,'DisplayName','$k$')
+loglog(h,h+h.^2,'--','LineWidth',1.5,'DisplayName','$\mathcal{O}(h+h^2)=\mathcal{O}(h+k)$')
 grid on
-legend('FontSize',15)
-xlabel('$k$','FontSize',15)
+legend('FontSize',15,'Location','northwest')
+title('$k=h^2$','FontSize',15)
+
+xlabel('$h$','FontSize',15)
 ylabel('Error','FontSize',15)
 exportgraphics(gcf,'../plots/exercise04/convergence.png','Resolution',300);
 
-%% Homogenous boundary, convergence of spatial variable
+%% Homogenous boundary, convergence
 
 clear; close all; clc;
 
 numEval = 20;
 
 epsilon = 0.01/pi;
-Nmax = 12000; % Maximal N to keep stability
+Nmax = 13000; % Maximal N to keep stability
 Nmin = 600; % Minimum N to keep stability
 M = 120000; % Fixed number of time steps to have stability at Nmax
 dudx = -152.00516; % True derivative
@@ -121,8 +125,11 @@ dudx = -152.00516; % True derivative
 tstar = 1.6037/pi; % Time of evaluation of derivative
 tmax = tstar;
 xbar = 0;
-Ns = linspace(Nmin,Nmax,numEval);
-Ms = Ns*10
+Ns = ceil(linspace(Nmin,Nmax,numEval));
+h = 2./Ns;
+k = h/10;
+Ms = ceil(tmax./k);
+Ms = 10*Ns
 
 error = zeros(length(Ns),1);
 
@@ -131,25 +138,24 @@ for i = 1:length(Ns)
     M = Ms(i)
     x = linspace(-1,1,N+1);
     t = linspace(0,tmax,M+1);
-    U = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon);
+    U = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon,"uniform");
     u = U(end,:);
     y = computeDerivative(u,x,5,5,N,xbar);
     error(i) = abs(dudx - y);
-
+    
     clear U
 end
 %%
-hs = 2./Ns;
 figure('Renderer', 'painters', 'Position', [400 400 1000 300]);
-loglog(hs,error,'.-','DisplayName',"$||U-u(x,t)||_\infty$")
+loglog(h(1:end-2),error(1:end-2),'.-','DisplayName',"$||U-u(x,t)||_\infty$",'linewidth',1.5,'markersize',20)
 hold on
-loglog(hs,1e8*hs.^2,'DisplayName','$\mathcal{O}(h^2)$')
+%loglog(h,h.^2,'DisplayName','$\mathcal{O}(h^2)$')
 grid on
 legend('FontSize',15,'Location','northwest')
 xlabel('$h$','FontSize',15)
 ylabel('Error','FontSize',15)
 
-exportgraphics(gcf,'../plots/exercise04/derivative_estimate_convergence.png','Resolution',300);
+exportgraphics(gcf,'../plots/exercise04/derivative_estimate_convergence2.png','Resolution',300);
 %% Illustration, varying N
 clear; close all; clc;
 
@@ -166,7 +172,7 @@ Us = cell(3,1);
 
 for i = 1:length(Ns)
     N = Ns(i)
-    Us{i} = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon); 
+    Us{i} = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon,"uniform"); 
 end
 
 figure('Renderer', 'painters', 'Position', [400 400 1000 600],'visible','off');
@@ -197,7 +203,7 @@ Us = cell(3,1);
 
 for i = 1:length(Ms)
     M = Ms(i)
-    Us{i} = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon); 
+    Us{i} = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon,"uniform"); 
 end
 
 figure('Renderer', 'painters', 'Position', [400 400 1000 600],'visible','off');
@@ -217,26 +223,79 @@ clear; close all; clc;
 epsilon = 0.01/pi;
 tstar = 1.6037/pi; % Time of evaluation of derivative
 tmax = tstar;
-N = 100;
-Nfine = 1000;
-M = 4000;
 
-N = 600;
-Nfine = 600;
-M = 90000;
+N = 300;
+M = 20000;
+a = [0.9 0.7 0.5 0.3];
+xbar = 0;
 
-[U,x,t] = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon,'nonuniform',Nfine);
-figure
-plot(x,x,'o-')
-figure;
+figure('Renderer', 'painters', 'Position', [400 400 1000 1000]);
+tiledlayout(4,3,'TileSpacing','compact');
+
+for i = 1:4
+
+    [U,x,t] = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon,'nonuniform',a(i));
+
+    nexttile;
+    plot(x(2:end),diff(x),'-')
+
+    nexttile;
+    imagesc(x,t,U)
+    axis square
+    
+    title(sprintf("$N = %d$, $M=%d$",N,M),'fontsize',13)
+    colorbar
+    clim([-1,1])
+    fontsize=13;
+    xlabel('$x$','FontSize',fontsize)
+    ylabel('$t$','FontSize',fontsize)
+
+    nexttile;
+    u = U(end,:);
+    plot(x,u)
+    grid on
+
+    y = computeDerivative(u,x,5,5,N,xbar)
+
+end
+
+%% Higher order
+
+clear; close all; clc;
+epsilon = 0.01/pi;
+tstar = 1.6037/pi; % Time of evaluation of derivative
+tmax = tstar;
+
+N = 1100; % Det her virker helt vildt godt!!
+M = 3000;
+xbar = 0;
+
+figure('Renderer', 'painters', 'Position', [400 400 1000 300]);
+tiledlayout(1,2,'TileSpacing','compact');
+
+[U,x,t] = AdvectionDiffusion(@homogeneousBoundaryFun,N,M,tmax,epsilon,'higher');
+
+
+nexttile;
 imagesc(x,t,U)
 axis square
+
 title(sprintf("$N = %d$, $M=%d$",N,M),'fontsize',13)
 colorbar
 clim([-1,1])
 fontsize=13;
 xlabel('$x$','FontSize',fontsize)
 ylabel('$t$','FontSize',fontsize)
+
+nexttile;
+u = U(end,:);
+plot(x,u)
+grid on
+
+y = computeDerivative(u,x,5,5,N,xbar)
+
+
+
 %% tester lige
 clear; clc; close all;
 

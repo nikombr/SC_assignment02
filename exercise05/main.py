@@ -40,7 +40,7 @@ if runtype == 1: # Parabolic
                             verbose = False,
                             pde = parabolic)
 
-            N_EPOCHS = 3000
+            N_EPOCHS = 10000
             loss = model.train(N_EPOCHS)
 
             U = model.predict().cpu().detach().numpy().reshape([N,M]).T
@@ -72,7 +72,7 @@ if runtype == 1: # Parabolic
                         verbose = False,
                         pde = parabolic)
 
-        N_EPOCHS = 3000
+        N_EPOCHS = 10000
         loss = model.train(N_EPOCHS)
 
         U = model.predict().cpu().detach().numpy().reshape([N,M]).T
@@ -100,7 +100,7 @@ if runtype == 1: # Parabolic
                         verbose = False,
                         pde = parabolic)
 
-        N_EPOCHS = 3000
+        N_EPOCHS = 10000
         loss = model.train(N_EPOCHS)
 
         U = model.predict().cpu().detach().numpy().reshape([N,M]).T
@@ -133,7 +133,7 @@ elif runtype == 2: # Hyperbolic
                     verbose = False,
                     pde = hyperbolic)
 
-    N_EPOCHS = 300
+    N_EPOCHS = 10000
     loss = model.train(N_EPOCHS)
 
     U = model.predict().cpu().detach().numpy().reshape([N,M]).T
@@ -152,6 +152,8 @@ elif runtype == 2: # Hyperbolic
     U_pred = model.predict(x=X_pred,t=T_pred).cpu().detach().numpy().reshape([N,M]).T
 
     mdic = {"U": U, "T": T, "X": X, "loss": loss, "x": x, "t": t, "U_pred": U_pred, "t_pred": t_pred.detach().cpu().numpy()}
+
+    savemat(f"results/{name}.mat", mdic)
 
 elif runtype == 3: # Advection
 
@@ -172,7 +174,7 @@ elif runtype == 3: # Advection
                     verbose = False,
                     pde = advection)
 
-    N_EPOCHS = 3000
+    N_EPOCHS = 10000
     loss = model.train(N_EPOCHS)
 
     U = model.predict().cpu().detach().numpy().reshape([N,M]).T

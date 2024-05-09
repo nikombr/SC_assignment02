@@ -1,5 +1,7 @@
-function u = fun(x,t)
+function u = fun(x,t,a)
 
-a = 0.5;
+if nargin == 2
+    a = 0.5;
+end
 
 u = sin(2*pi*(x-a*t));

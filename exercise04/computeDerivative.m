@@ -6,6 +6,6 @@ a = -alpha*h;               % First displacement point in stencil
 b = beta*h;                 % Last displacement point in stencil
 n = alpha + beta + 1;       % Grid size
 x = x((mid-alpha):(mid+beta)); % Get grid points
-c = fdcoeffV(k,xbar,x);     % Get coefficients
+c = fdcoeffF(k,xbar,x);     % Get coefficients
 us = u((mid-alpha):(mid+beta));                  % Get values for stencil
 y = us*c';                  % Get derivative in point xbar
